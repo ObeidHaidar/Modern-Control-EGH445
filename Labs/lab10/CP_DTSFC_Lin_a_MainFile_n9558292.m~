@@ -1,0 +1,68 @@
+clear all;
+
+%% parameters
+
+m=0.15;
+Mc=0.4;
+l=0.2;
+g=9.81;
+
+%% matrices
+
+Aa=[0,0,1,0;0,0,0,1;0,-m*g/Mc,0,0;0,g*(Mc+m)/(l*Mc),0,0];
+Ba=[0;0;1/Mc;-1/(l*Mc)];
+Ca=eye(4);
+Da=zeros(4,1);
+
+%% continuous-time state-space model
+
+sysc=ss(Aa,Ba,Ca,Da);
+
+%% discrete-time state-space model
+
+T_s=0.03;
+sysdzoh=c2d(sysc,T_s,'zoh');
+
+%% eigenvalues
+
+Pa_c=[-3,-4,-5,-6];
+Pa_d= exp(T_s*Pa_c);
+
+%% controllability
+
+K_da = place(sysdzoh.A,sysdzoh.B,Pa_d);
+
+%% simulation
+x10=0.2; %initial condition position
+x20=deg2rad(20); %initial condition angle
+x30=0; %initial condition velocity
+x40=0; %initial condition angular velocity¸ç
+x2_bar=0;
+x1_bar=0;
+sim('CP_ContrSys_Lin_a_n9558292') % linear
+sim('CP_ContrSys_NLin_n9558292.slx' )%nonlinear
+
+%% plot
+figure
+subplot(4,1,1)
+stem(tda,x1da)
+hold on
+plot(ta,x1a
+legend('Discrete-time model','sampled-data model')
+title('Position x [m]','FontSize',18)
+grid on
+subplot(4,1,2)
+stem(tda,x2da)
+legend('Discrete-time model','sampled-data model')
+title('Angle [rad]','FontSize',18)
+grid on
+subplot(4,1,3)
+stem(tda,x3da)
+legend('Discrete-time model','sampled-data model')
+title('Velocity [m/s]','FontSize',18)
+grid on
+subplot(4,4,4)
+stem(tda,x1da)
+legend('Discrete-time model','sampled-data model')
+title('Angular Velocity [rad/s]','FontSize',18)
+grid on
